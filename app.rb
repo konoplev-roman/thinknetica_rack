@@ -1,15 +1,6 @@
 # frozen_string_literal: true
 
 class App
-  TIME_FORMATS = {
-    'year' => '%Y',
-    'month' => '%m',
-    'day' => '%d',
-    'hour' => '%H',
-    'minute' => '%M',
-    'second' => '%S'
-  }.freeze
-
   def call(env)
     request = Rack::Request.new(env)
 
@@ -21,21 +12,11 @@ class App
   def perform_request(request)
     return not_found unless request.get? && request.path == '/time'
 
-    time_format = parse_time_format(request)
+    format = TimeFormatter.new(request.params['format'])
 
-    return bad_request('Missing time format') if time_format.empty?
+    return bad_request(format.errors) unless format.valid?
 
-    unknown_time_format = time_format - TIME_FORMATS.keys
-
-    return bad_request("Unknown time format: #{unknown_time_format.join(', ')}") if unknown_time_format.any?
-
-    strftime_format = time_format.map { |f| TIME_FORMATS[f] }.join('-')
-
-    build_response(Time.now.strftime(strftime_format))
-  end
-
-  def parse_time_format(request)
-    request.params['format'].to_s.strip.split(',')
+    build_response(format.time)
   end
 
   def not_found
