@@ -2,20 +2,12 @@
 
 class App
   def call(_env)
-    [status, headers, body]
+    build_response("Hello, World!\n")
   end
 
   private
 
-  def status
-    200
-  end
-
-  def headers
-    { 'Content-Type' => 'text/plain' }
-  end
-
-  def body
-    ["Hello, World!\n"]
+  def build_response(body, status: 200)
+    [status, { 'Content-Type' => 'text/plain' }, [body]]
   end
 end
