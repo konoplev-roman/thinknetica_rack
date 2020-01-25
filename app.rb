@@ -29,7 +29,9 @@ class App
 
     return bad_request("Unknown time format: #{unknown_time_format.join(', ')}") if unknown_time_format.any?
 
-    build_response(time_format.inspect)
+    strftime_format = time_format.map { |f| TIME_FORMATS[f] }.join('-')
+
+    build_response(Time.now.strftime(strftime_format))
   end
 
   def parse_time_format(request)
